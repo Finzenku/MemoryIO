@@ -70,6 +70,17 @@ namespace MemoryManagement.Managers
             freeingMemory(value);
             return temp;
         }
+
+        public byte[] ReadData(IntPtr address, int dataLength)
+        {
+            IntPtr value = ReadMemory(p.Id, address, dataLength);
+            byte[] dataBuffer = new byte[dataLength];
+            Marshal.Copy(value, dataBuffer, 0, dataBuffer.Length);
+
+            freeingMemory(value);
+            return dataBuffer;
+        }
+
         //Basic implementation, leave for Zackmon someday :)
         public T[] ReadArray<T>(IntPtr address, int arrayLength)
         {
