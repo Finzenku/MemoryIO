@@ -76,7 +76,7 @@ namespace MemoryManagement.Monitors
                         byte[] currentData = memoryManager.ReadData(currentPointerValue + pointerOffset + startIndex, dataSize);
                         if (!previousData.AsSpan(startIndex, dataSize).SequenceEqual(currentData))
                         {
-                            OnMemoryChanged(currentPointerValue, MarshalType<T>.ByteArrayToObject(currentData), i);
+                            OnMemoryChanged(currentPointerValue + pointerOffset, MarshalType<T>.ByteArrayToObject(currentData), i);
                             currentData.CopyTo(previousData, startIndex);
                         }
                     }
@@ -110,7 +110,7 @@ namespace MemoryManagement.Monitors
                             byte[] currentData = memoryManager.ReadData(currentPointerValue + pointerOffset + startIndex, dataSize);
                             if (!previousData.AsSpan(startIndex, dataSize).SequenceEqual(currentData))
                             {
-                                OnMemoryChanged(currentPointerValue, MarshalType<T>.ByteArrayToObject(currentData), i);
+                                OnMemoryChanged(currentPointerValue + pointerOffset, MarshalType<T>.ByteArrayToObject(currentData), i);
                                 currentData.CopyTo(previousData, startIndex);
                             }
                         }
