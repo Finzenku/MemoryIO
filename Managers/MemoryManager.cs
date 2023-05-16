@@ -22,6 +22,7 @@ namespace MemoryManagement
         }
 
         public T Read<T>(IntPtr address) => m.Read<T>(address);
+        public byte[] ReadData(IntPtr address, int dataLength) => m.ReadData(address, dataLength);
         public T[] ReadArray<T>(IntPtr address, int arrayLength) => m.ReadArray<T>(address, arrayLength);
 
         public string ReadString(IntPtr address, Encoding encoding, int maxLength = 512) => m.ReadString(address, encoding, maxLength);

@@ -39,6 +39,13 @@ namespace MemoryManagement.Managers
             return MarshalType<T>.ByteArrayToObject(dataBuffer);
         }
 
+        public byte[] ReadData(IntPtr address, int dataLength)
+        {
+            byte[] dataBuffer = new byte[dataLength];
+            ReadProcessMemory(p.Handle, address, dataBuffer, dataBuffer.Length, out IntPtr bytesRead);
+            return dataBuffer;
+        }
+
         public T[] ReadArray<T>(IntPtr address, int arrayLength)
         {
             int typeSize = MarshalType<T>.Size;
