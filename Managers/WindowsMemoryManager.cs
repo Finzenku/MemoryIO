@@ -8,6 +8,7 @@ namespace MemoryManagement.Managers
     internal class WindowsMemoryManager : IMemoryManager
     {
         private Process p;
+        private byte[] buffer;
 
         //Import ReadProcessMemory
         [DllImport("kernel32.dll", SetLastError = true)]
@@ -30,49 +31,56 @@ namespace MemoryManagement.Managers
         public WindowsMemoryManager(Process process)
         {
             p = process;
+            buffer = new byte[2048];
         }
 
         public T Read<T>(IntPtr address)
         {
-            byte[] dataBuffer = new byte[MarshalType<T>.Size];
-            ReadProcessMemory(p.Handle, address, dataBuffer, dataBuffer.Length, out IntPtr bytesRead);
-            return MarshalType<T>.ByteArrayToObject(dataBuffer);
+            int dataSize = MarshalType<T>.Size;
+            EnsureBufferCapacity(dataSize);
+
+            ReadProcessMemory(p.Handle, address, buffer, dataSize, out IntPtr bytesRead);
+            return MarshalType<T>.ByteArrayToObject(buffer);
         }
 
         public byte[] ReadData(IntPtr address, int dataLength)
         {
-            byte[] dataBuffer = new byte[dataLength];
-            ReadProcessMemory(p.Handle, address, dataBuffer, dataBuffer.Length, out IntPtr bytesRead);
-            return dataBuffer;
+            EnsureBufferCapacity(dataLength);
+
+            ReadProcessMemory(p.Handle, address, buffer, dataLength, out IntPtr bytesRead);
+            return buffer[..dataLength];
         }
 
         public T[] ReadArray<T>(IntPtr address, int arrayLength)
         {
-            int typeSize = MarshalType<T>.Size;
-            byte[] dataBuffer = new byte[typeSize * arrayLength];
+            int dataSize = MarshalType<T>.Size;
+            EnsureBufferCapacity(dataSize * arrayLength);
+
             T[] tArray = new T[arrayLength];
-            ReadProcessMemory(p.Handle, address, dataBuffer, dataBuffer.Length, out IntPtr bytesRead);
+            ReadProcessMemory(p.Handle, address, buffer, dataSize * arrayLength, out IntPtr bytesRead);
             if (MarshalType<T>.TypeCode == TypeCode.Byte)
-                return (T[])(object)dataBuffer;
+                return (T[])(object)buffer[..arrayLength];
             for (int i = 0; i < arrayLength; i++)
-                tArray[i] = MarshalType<T>.ByteArrayToObject(dataBuffer[(typeSize*i)..(typeSize*(i+1))]);
+                tArray[i] = MarshalType<T>.ByteArrayToObject(buffer[(dataSize*i)..(dataSize*(i+1))]);
             return tArray;
         }
 
         public string ReadString(IntPtr address, Encoding encoding, int maxLength = 512)
         {
-            byte[] dataBuffer = new byte[maxLength];
-            ReadProcessMemory(p.Handle, address, dataBuffer, dataBuffer.Length, out IntPtr bytesRead);
-            string encoded = encoding.GetString(dataBuffer);
+            EnsureBufferCapacity(maxLength);
+
+            ReadProcessMemory(p.Handle, address, buffer, maxLength, out IntPtr bytesRead);
+            string encoded = encoding.GetString(buffer);
             int endOfStringPos = encoded.IndexOf('\0');
             return endOfStringPos == -1 ? encoded : encoded.Substring(0, endOfStringPos);
         }
 
         public string[] ReadStringArray(IntPtr address, Encoding encoding, int maxLength = 512)
         {
-            byte[] dataBuffer = new byte[maxLength];
-            ReadProcessMemory(p.Handle, address, dataBuffer, dataBuffer.Length, out IntPtr bytesRead);
-            string encoded = encoding.GetString(dataBuffer);
+            EnsureBufferCapacity(maxLength);
+
+            ReadProcessMemory(p.Handle, address, buffer, maxLength, out IntPtr bytesRead);
+            string encoded = encoding.GetString(buffer);
             string[] split = encoded.Split('\0');
             for (int i = 0; i < split.Length; i++)
                 if (split[i] == string.Empty)
@@ -92,7 +100,7 @@ namespace MemoryManagement.Managers
             byte[] data = new byte[value.Length*typeSize];
             for (int i = 0; i < value.Length; i++)
             {
-                Array.Copy(MarshalType<T>.ObjectToByteArray(value[i]),0,data,i*typeSize,typeSize);
+                Buffer.BlockCopy(MarshalType<T>.ObjectToByteArray(value[i]),0,data,i*typeSize,typeSize);
             }
             WriteProcessMemory(p.Handle, address, data, data.Length, out IntPtr intPtr);
         }
@@ -105,9 +113,17 @@ namespace MemoryManagement.Managers
         public void WriteStringArray(IntPtr address, string[] text, Encoding encoding)
         {
             List<byte> data = new();
+
             foreach(string s in text)
                 data.AddRange(encoding.GetBytes(s+'\0'));
+
             WriteProcessMemory(p.Handle, address, data.ToArray(), data.Count, out IntPtr intPtr);
+        }
+
+        private void EnsureBufferCapacity(int dataLength)
+        {
+            if (dataLength > buffer.Length)
+                buffer = new byte[dataLength];
         }
     }
 }
