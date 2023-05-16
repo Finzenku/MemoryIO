@@ -83,8 +83,7 @@ namespace MemoryManagement.Monitors
                 }
                 Thread.Sleep(pollingRate);
             }
-
-            isMonitoring = false;
+            StopMonitoring();
         }
 
         /// <summary>
@@ -96,28 +95,37 @@ namespace MemoryManagement.Monitors
             if (isMonitoring) return;
             isMonitoring = true;
 
-            while (pointerAddress != IntPtr.Zero && isMonitoring)
+            try
             {
-                cancellationToken.ThrowIfCancellationRequested();
-                IntPtr currentPointerValue = memoryManager.Read<IntPtr>(pointerAddress);
-                if (currentPointerValue != IntPtr.Zero)
+                while (pointerAddress != IntPtr.Zero && isMonitoring)
                 {
-                    for (int i = 0; i < arrayLength; i++)
+                    cancellationToken.ThrowIfCancellationRequested();
+                    IntPtr currentPointerValue = memoryManager.Read<IntPtr>(pointerAddress);
+                    if (currentPointerValue != IntPtr.Zero)
                     {
-                        int startIndex = i * dataSize;
-
-                        byte[] currentData = memoryManager.ReadData(currentPointerValue + pointerOffset + startIndex, dataSize);
-                        if (!previousData.AsSpan(startIndex, dataSize).SequenceEqual(currentData))
+                        for (int i = 0; i < arrayLength; i++)
                         {
-                            OnMemoryChanged(currentPointerValue, MarshalType<T>.ByteArrayToObject(currentData), i);
-                            currentData.CopyTo(previousData, startIndex);
+                            int startIndex = i * dataSize;
+
+                            byte[] currentData = memoryManager.ReadData(currentPointerValue + pointerOffset + startIndex, dataSize);
+                            if (!previousData.AsSpan(startIndex, dataSize).SequenceEqual(currentData))
+                            {
+                                OnMemoryChanged(currentPointerValue, MarshalType<T>.ByteArrayToObject(currentData), i);
+                                currentData.CopyTo(previousData, startIndex);
+                            }
                         }
                     }
+                    await Task.Delay(pollingRate, cancellationToken);
                 }
-                await Task.Delay(pollingRate, cancellationToken);
             }
+            catch (TaskCanceledException)
+            {
 
-            isMonitoring = false;
+            }
+            finally
+            {
+                StopMonitoring();
+            }
 
         }
 

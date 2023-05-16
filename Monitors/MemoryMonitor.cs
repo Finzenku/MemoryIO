@@ -65,7 +65,7 @@ namespace MemoryManagement.Monitors
                 }
                 Thread.Sleep(pollingRate);
             }
-            isMonitoring = false;
+            StopMonitoring();
         }
 
         /// <summary>
@@ -77,20 +77,29 @@ namespace MemoryManagement.Monitors
             if (isMonitoring) return;
             isMonitoring = true;
 
-            while (address != IntPtr.Zero && isMonitoring)
+            try
             {
-                cancellationToken.ThrowIfCancellationRequested();
-
-                byte[] currentData = memoryManager.ReadData(address, regionSize);
-                if (!previousData.SequenceEqual(currentData))
+                while (address != IntPtr.Zero && isMonitoring)
                 {
-                    OnMemoryChanged(address, currentData);
-                    previousData = currentData;
-                }
-                await Task.Delay(pollingRate, cancellationToken);
-            }
+                    cancellationToken.ThrowIfCancellationRequested();
 
-            isMonitoring = false;
+                    byte[] currentData = memoryManager.ReadData(address, regionSize);
+                    if (!previousData.SequenceEqual(currentData))
+                    {
+                        OnMemoryChanged(address, currentData);
+                        previousData = currentData;
+                    }
+                    await Task.Delay(pollingRate, cancellationToken);
+                }
+            }
+            catch (TaskCanceledException)
+            {
+
+            }
+            finally
+            {
+                StopMonitoring();
+            }
         }
 
         /// <summary>

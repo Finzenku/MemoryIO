@@ -72,8 +72,7 @@ namespace MemoryManagement.Monitors
                 }
                 Thread.Sleep(pollingRate);
             }
-
-            isMonitoring = false;
+            StopMonitoring();
         }
 
         /// <summary>
@@ -85,23 +84,32 @@ namespace MemoryManagement.Monitors
             if (isMonitoring) return;
             isMonitoring = true;
 
-            while (pointerAddress != IntPtr.Zero && isMonitoring)
+            try
             {
-                cancellationToken.ThrowIfCancellationRequested();
-                IntPtr currentPointerValue = memoryManager.Read<IntPtr>(pointerAddress);
-                if (currentPointerValue != IntPtr.Zero)
+                while (pointerAddress != IntPtr.Zero && isMonitoring)
                 {
-                    byte[] currentData = memoryManager.ReadData(currentPointerValue + pointerOffset, dataSize);
-                    if (!previousData.SequenceEqual(currentData))
+                    cancellationToken.ThrowIfCancellationRequested();
+                    IntPtr currentPointerValue = memoryManager.Read<IntPtr>(pointerAddress);
+                    if (currentPointerValue != IntPtr.Zero)
                     {
-                        OnMemoryChanged(currentPointerValue + pointerOffset, MarshalType<T>.ByteArrayToObject(currentData));
-                        previousData = currentData;
+                        byte[] currentData = memoryManager.ReadData(currentPointerValue + pointerOffset, dataSize);
+                        if (!previousData.SequenceEqual(currentData))
+                        {
+                            OnMemoryChanged(currentPointerValue + pointerOffset, MarshalType<T>.ByteArrayToObject(currentData));
+                            previousData = currentData;
+                        }
                     }
+                    await Task.Delay(pollingRate, cancellationToken);
                 }
-                await Task.Delay(pollingRate, cancellationToken);
             }
+            catch (TaskCanceledException)
+            {
 
-            isMonitoring = false;
+            }
+            finally
+            {
+                StopMonitoring();
+            }
 
         }
 

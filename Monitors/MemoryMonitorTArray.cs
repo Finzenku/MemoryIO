@@ -76,7 +76,7 @@ namespace MemoryManagement.Monitors
                 }
                 Thread.Sleep(pollingRate);
             }
-            isMonitoring = false;
+            StopMonitoring();
         }
 
         /// <summary>
@@ -88,24 +88,33 @@ namespace MemoryManagement.Monitors
             if (isMonitoring) return;
             isMonitoring = true;
 
-            while (address != IntPtr.Zero && isMonitoring)
+            try
             {
-                cancellationToken.ThrowIfCancellationRequested();
-                for (int i = 0; i < arrayLength; i++)
+                while (address != IntPtr.Zero && isMonitoring)
                 {
-                    int startIndex = i * dataSize;
-
-                    byte[] currentData = memoryManager.ReadData(address + startIndex, dataSize);
-                    if (!previousData.AsSpan(startIndex, dataSize).SequenceEqual(currentData))
+                    cancellationToken.ThrowIfCancellationRequested();
+                    for (int i = 0; i < arrayLength; i++)
                     {
-                        OnMemoryChanged(address, MarshalType<T>.ByteArrayToObject(currentData), i);
-                        currentData.CopyTo(previousData, startIndex);
-                    }
-                }
-                await Task.Delay(pollingRate, cancellationToken);
-            }
+                        int startIndex = i * dataSize;
 
-            isMonitoring = false;
+                        byte[] currentData = memoryManager.ReadData(address + startIndex, dataSize);
+                        if (!previousData.AsSpan(startIndex, dataSize).SequenceEqual(currentData))
+                        {
+                            OnMemoryChanged(address, MarshalType<T>.ByteArrayToObject(currentData), i);
+                            currentData.CopyTo(previousData, startIndex);
+                        }
+                    }
+                    await Task.Delay(pollingRate, cancellationToken);
+                }
+            }
+            catch (TaskCanceledException)
+            {
+
+            }
+            finally
+            {
+                StopMonitoring();
+            }
         }
 
         /// <summary>
