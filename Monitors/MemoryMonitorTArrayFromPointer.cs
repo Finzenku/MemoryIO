@@ -104,11 +104,13 @@ namespace MemoryManagement.Monitors
                 {
                     for (int i = 0; i < arrayLength; i++)
                     {
-                        byte[] currentData = memoryManager.ReadData(currentPointerValue + pointerOffset + i * dataSize, dataSize);
-                        if (!previousData[(i * dataSize)..((i + i) * dataSize)].SequenceEqual(currentData))
+                        int startIndex = i * dataSize;
+
+                        byte[] currentData = memoryManager.ReadData(currentPointerValue + pointerOffset + startIndex, dataSize);
+                        if (!previousData.AsSpan(startIndex, dataSize).SequenceEqual(currentData))
                         {
                             OnMemoryChanged(currentPointerValue, MarshalType<T>.ByteArrayToObject(currentData), i);
-                            Array.Copy(currentData, 0, previousData, i * dataSize, dataSize);
+                            currentData.CopyTo(previousData, startIndex);
                         }
                     }
                 }
