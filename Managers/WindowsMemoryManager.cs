@@ -39,7 +39,7 @@ namespace MemoryManagement.Managers
             Process = process;
             if (Environment.Is64BitOperatingSystem && IsWow64Process(process.Handle, out bool isWow64))
             {
-                is64BitProcess = isWow64;
+                is64BitProcess = !isWow64;
             }
             else
             {
