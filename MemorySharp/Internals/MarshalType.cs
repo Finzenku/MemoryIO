@@ -102,6 +102,8 @@ namespace MemoryManagement.Internals
                     break;
                 case TypeCode.Boolean:
                     return BitConverter.GetBytes((bool)(object)obj);
+                case TypeCode.Byte:
+                    return new byte[] {(byte)(object)obj}; 
                 case TypeCode.Char:
                     return Encoding.UTF8.GetBytes(new[] {(char)(object)obj});
                 case TypeCode.Double:
