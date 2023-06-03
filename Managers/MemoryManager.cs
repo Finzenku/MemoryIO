@@ -4,14 +4,18 @@ using MemoryManagement.Managers;
 
 namespace MemoryManagement
 {
-    public class MemoryManager : IMemoryManager
+    public class MemoryManager : IProcessMemoryManager
     {
-        private IMemoryManager m;
+        private IProcessMemoryManager m;
+
+        public Process Process => m.Process;
+
+        public bool Is64BitProcess => m.Is64BitProcess;
 
         public MemoryManager(Process process)
         {
-            if (System.Environment.OSVersion.Platform == PlatformID.Unix ||
-                System.Environment.OSVersion.Platform == PlatformID.MacOSX)
+            if (Environment.OSVersion.Platform == PlatformID.Unix ||
+                Environment.OSVersion.Platform == PlatformID.MacOSX)
             {
                 m = new LinuxMemoryManager(process);
             }

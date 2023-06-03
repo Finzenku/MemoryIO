@@ -5,10 +5,12 @@ using System.Text;
 
 namespace MemoryManagement.Managers
 {
-    internal class WindowsMemoryManager : IMemoryManager
+    internal class WindowsMemoryManager : IProcessMemoryManager
     {
-        private Process p;
-        private byte[] buffer;
+        public Process Process { get; }
+
+        private bool is64BitProcess;
+        public bool Is64BitProcess => is64BitProcess;
 
         //Import ReadProcessMemory
         [DllImport("kernel32.dll", SetLastError = true)]
@@ -28,36 +30,47 @@ namespace MemoryManagement.Managers
         int dwSize,
         out IntPtr lpNumberOfBytesWritten);
 
+        //Import IsWow64Process
+        [DllImport("kernel32.dll", SetLastError = true)]
+        private static extern bool IsWow64Process(IntPtr processHandle, out bool isWow64Process);
+
         public WindowsMemoryManager(Process process)
         {
-            p = process;
-            buffer = new byte[2048];
+            Process = process;
+            if (Environment.Is64BitOperatingSystem && IsWow64Process(process.Handle, out bool isWow64))
+            {
+                is64BitProcess = isWow64;
+            }
+            else
+            {
+                is64BitProcess = false;
+            }
         }
 
         public T Read<T>(IntPtr address)
         {
             int dataSize = MarshalType<T>.Size;
-            EnsureBufferCapacity(dataSize);
+            byte[] buffer = new byte[dataSize];
 
-            ReadProcessMemory(p.Handle, address, buffer, dataSize, out IntPtr bytesRead);
+            ReadProcessMemory(Process.Handle, address, buffer, dataSize, out IntPtr bytesRead);
             return MarshalType<T>.ByteArrayToObject(buffer);
         }
 
         public byte[] ReadData(IntPtr address, int dataLength)
         {
-            EnsureBufferCapacity(dataLength);
+            byte[] buffer = new byte[dataLength];
 
-            ReadProcessMemory(p.Handle, address, buffer, dataLength, out IntPtr bytesRead);
+            ReadProcessMemory(Process.Handle, address, buffer, dataLength, out IntPtr bytesRead);
             return buffer[..dataLength];
         }
 
         public T[] ReadArray<T>(IntPtr address, int arrayLength)
         {
             int dataSize = MarshalType<T>.Size;
-            EnsureBufferCapacity(dataSize * arrayLength);
+            byte[] buffer = new byte[dataSize * arrayLength];
 
             T[] tArray = new T[arrayLength];
-            ReadProcessMemory(p.Handle, address, buffer, dataSize * arrayLength, out IntPtr bytesRead);
+            ReadProcessMemory(Process.Handle, address, buffer, dataSize * arrayLength, out IntPtr bytesRead);
             if (MarshalType<T>.TypeCode == TypeCode.Byte)
                 return (T[])(object)buffer[..arrayLength];
             for (int i = 0; i < arrayLength; i++)
@@ -67,9 +80,9 @@ namespace MemoryManagement.Managers
 
         public string ReadString(IntPtr address, Encoding encoding, int maxLength = 512)
         {
-            EnsureBufferCapacity(maxLength);
+            byte[] buffer = new byte[maxLength];
 
-            ReadProcessMemory(p.Handle, address, buffer, maxLength, out IntPtr bytesRead);
+            ReadProcessMemory(Process.Handle, address, buffer, maxLength, out IntPtr bytesRead);
             string encoded = encoding.GetString(buffer);
             int endOfStringPos = encoded.IndexOf('\0');
             return endOfStringPos == -1 ? encoded : encoded.Substring(0, endOfStringPos);
@@ -77,9 +90,9 @@ namespace MemoryManagement.Managers
 
         public string[] ReadStringArray(IntPtr address, Encoding encoding, int maxLength = 512)
         {
-            EnsureBufferCapacity(maxLength);
+            byte[] buffer = new byte[maxLength];
 
-            ReadProcessMemory(p.Handle, address, buffer, maxLength, out IntPtr bytesRead);
+            ReadProcessMemory(Process.Handle, address, buffer, maxLength, out IntPtr bytesRead);
             string encoded = encoding.GetString(buffer);
             string[] split = encoded.Split('\0');
             for (int i = 0; i < split.Length; i++)
@@ -91,7 +104,7 @@ namespace MemoryManagement.Managers
         public void Write<T>(IntPtr address, T value)
         {
             byte[] data = MarshalType<T>.ObjectToByteArray(value);
-            WriteProcessMemory(p.Handle, address, data, data.Length, out IntPtr intPtr);
+            WriteProcessMemory(Process.Handle, address, data, data.Length, out IntPtr intPtr);
         }
 
         public void WriteArray<T>(IntPtr address, T[] value)
@@ -102,13 +115,13 @@ namespace MemoryManagement.Managers
             {
                 Buffer.BlockCopy(MarshalType<T>.ObjectToByteArray(value[i]),0,data,i*typeSize,typeSize);
             }
-            WriteProcessMemory(p.Handle, address, data, data.Length, out IntPtr intPtr);
+            WriteProcessMemory(Process.Handle, address, data, data.Length, out IntPtr intPtr);
         }
 
         public void WriteString(IntPtr address, string text, Encoding encoding)
         {
             byte[] data = encoding.GetBytes(text+'\0');
-            WriteProcessMemory(p.Handle, address, data, data.Length, out IntPtr intPtr);
+            WriteProcessMemory(Process.Handle, address, data, data.Length, out IntPtr intPtr);
         }
         public void WriteStringArray(IntPtr address, string[] text, Encoding encoding)
         {
@@ -117,13 +130,7 @@ namespace MemoryManagement.Managers
             foreach(string s in text)
                 data.AddRange(encoding.GetBytes(s+'\0'));
 
-            WriteProcessMemory(p.Handle, address, data.ToArray(), data.Count, out IntPtr intPtr);
-        }
-
-        private void EnsureBufferCapacity(int dataLength)
-        {
-            if (dataLength > buffer.Length)
-                buffer = new byte[dataLength];
+            WriteProcessMemory(Process.Handle, address, data.ToArray(), data.Count, out IntPtr intPtr);
         }
     }
 }
