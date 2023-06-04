@@ -52,7 +52,7 @@ namespace MemoryManagement.Managers
             int dataSize = MarshalType<T>.Size;
             byte[] buffer = new byte[dataSize];
 
-            ReadProcessMemory(Process.Handle, address, buffer, dataSize, out IntPtr bytesRead);
+            ReadProcessMemory(Process.Handle, address, buffer, dataSize, out _);
             return MarshalType<T>.ByteArrayToObject(buffer);
         }
 
@@ -60,7 +60,7 @@ namespace MemoryManagement.Managers
         {
             byte[] buffer = new byte[dataLength];
 
-            ReadProcessMemory(Process.Handle, address, buffer, dataLength, out IntPtr bytesRead);
+            ReadProcessMemory(Process.Handle, address, buffer, dataLength, out _);
             return buffer[..dataLength];
         }
 
@@ -70,7 +70,7 @@ namespace MemoryManagement.Managers
             byte[] buffer = new byte[dataSize * arrayLength];
 
             T[] tArray = new T[arrayLength];
-            ReadProcessMemory(Process.Handle, address, buffer, dataSize * arrayLength, out IntPtr bytesRead);
+            ReadProcessMemory(Process.Handle, address, buffer, dataSize * arrayLength, out _);
             if (MarshalType<T>.TypeCode == TypeCode.Byte)
                 return (T[])(object)buffer[..arrayLength];
             for (int i = 0; i < arrayLength; i++)
@@ -82,7 +82,7 @@ namespace MemoryManagement.Managers
         {
             byte[] buffer = new byte[maxLength];
 
-            ReadProcessMemory(Process.Handle, address, buffer, maxLength, out IntPtr bytesRead);
+            ReadProcessMemory(Process.Handle, address, buffer, maxLength, out _);
             string encoded = encoding.GetString(buffer);
             int endOfStringPos = encoded.IndexOf('\0');
             return endOfStringPos == -1 ? encoded : encoded.Substring(0, endOfStringPos);
@@ -92,7 +92,7 @@ namespace MemoryManagement.Managers
         {
             byte[] buffer = new byte[maxLength];
 
-            ReadProcessMemory(Process.Handle, address, buffer, maxLength, out IntPtr bytesRead);
+            ReadProcessMemory(Process.Handle, address, buffer, maxLength, out _);
             string encoded = encoding.GetString(buffer);
             string[] split = encoded.Split('\0');
             for (int i = 0; i < split.Length; i++)
@@ -104,33 +104,47 @@ namespace MemoryManagement.Managers
         public void Write<T>(IntPtr address, T value)
         {
             byte[] data = MarshalType<T>.ObjectToByteArray(value);
-            WriteProcessMemory(Process.Handle, address, data, data.Length, out IntPtr intPtr);
+            WriteProcessMemory(Process.Handle, address, data, data.Length, out _);
         }
 
         public void WriteArray<T>(IntPtr address, T[] value)
         {
             int typeSize = MarshalType<T>.Size;
+            if (value is byte[] byteArray)
+            {
+                WriteProcessMemory(Process.Handle, address, byteArray, byteArray.Length, out _);
+                return;
+            }
             byte[] data = new byte[value.Length*typeSize];
             for (int i = 0; i < value.Length; i++)
             {
                 Buffer.BlockCopy(MarshalType<T>.ObjectToByteArray(value[i]),0,data,i*typeSize,typeSize);
             }
-            WriteProcessMemory(Process.Handle, address, data, data.Length, out IntPtr intPtr);
+            WriteProcessMemory(Process.Handle, address, data, data.Length, out _);
         }
 
         public void WriteString(IntPtr address, string text, Encoding encoding)
         {
             byte[] data = encoding.GetBytes(text+'\0');
-            WriteProcessMemory(Process.Handle, address, data, data.Length, out IntPtr intPtr);
+            WriteProcessMemory(Process.Handle, address, data, data.Length, out _);
         }
         public void WriteStringArray(IntPtr address, string[] text, Encoding encoding)
         {
-            List<byte> data = new();
+            int totalLength = 0;
+            foreach (string s in text)
+                totalLength += encoding.GetByteCount(s) + 1; // +1 for null termination
 
-            foreach(string s in text)
-                data.AddRange(encoding.GetBytes(s+'\0'));
+            byte[] buffer = new byte[totalLength];
+            int offset = 0;
 
-            WriteProcessMemory(Process.Handle, address, data.ToArray(), data.Count, out IntPtr intPtr);
+            foreach (string s in text)
+            {
+                int byteCount = encoding.GetBytes(s, buffer.AsSpan(offset));
+                buffer[offset + byteCount] = 0; // Null termination
+                offset += byteCount + 1; // Move the offset to the next string
+            }
+
+            WriteProcessMemory(Process.Handle, address, buffer, buffer.Length, out _);
         }
     }
 }
