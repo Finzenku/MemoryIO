@@ -2,11 +2,11 @@
 using System.Text;
 using MemoryManagement.Managers;
 
-namespace MemoryManagement
+namespace MemoryManagement.Managers
 {
-    public class MemoryManager : IProcessMemoryManager
+    public class MemoryManager : IMemoryManager
     {
-        private IProcessMemoryManager m;
+        private IPlatformMemoryManager m;
 
         public Process Process => m.Process;
 

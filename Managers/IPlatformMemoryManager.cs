@@ -2,9 +2,10 @@
 
 namespace MemoryManagement.Managers
 {
-    public interface IProcessMemoryManager : IMemoryManager
+    public interface IPlatformMemoryManager : IMemoryManager
     {
         public Process Process { get; }
+        public PlatformID Platform { get; }
         public bool Is64BitProcess { get; }
     }
 }

@@ -4,13 +4,13 @@ using System.Text;
 
 namespace MemoryManagement.Managers
 {
-    internal class LinuxMemoryManager : IProcessMemoryManager
+    internal class LinuxMemoryManager : IPlatformMemoryManager
     {
         public Process Process { get; }
 
         private bool is64BitProcess;
         public bool Is64BitProcess => is64BitProcess;
-
+        public PlatformID Platform => PlatformID.Unix;
 
         [DllImport("libc")]
         private static extern unsafe int process_vm_readv(int pid, iovec* local_iov, ulong liovcnt, iovec* remote_iov, ulong riovcnt, ulong flags);

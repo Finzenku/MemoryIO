@@ -5,12 +5,13 @@ using System.Text;
 
 namespace MemoryManagement.Managers
 {
-    internal class WindowsMemoryManager : IProcessMemoryManager
+    internal class WindowsMemoryManager : IPlatformMemoryManager
     {
         public Process Process { get; }
 
         private bool is64BitProcess;
         public bool Is64BitProcess => is64BitProcess;
+        public PlatformID Platform => PlatformID.Win32NT;
 
         //Import ReadProcessMemory
         [DllImport("kernel32.dll", SetLastError = true)]
