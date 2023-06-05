@@ -25,27 +25,41 @@ namespace MemoryManagement.Managers
             Process = process;
             try
             {
-                string? processPath = Process.MainModule?.FileName;
-
-                if (processPath is null)
-                    throw new Exception("Process MainModule did not return a valid file path");
-
-                using (var stream = new FileStream(processPath, FileMode.Open, FileAccess.Read))
-                {
-                    byte[] buffer = new byte[5];
-                    if (stream.Read(buffer, 0, buffer.Length) == buffer.Length)
-                    {
-                        // The 5th byte of the ELF header indicate the architecture
-                        // 0x01: 32-bit, 0x02: 64-bit
-                        is64BitProcess = buffer[4] == 0x02;
-                    }
-                }
+                is64BitProcess = CheckIfProcess64Bit(process);
             }
             catch (Exception)
             {
-                // Handle any exceptions that might occur while reading the file
-                // Or don't
+                is64BitProcess = Environment.Is64BitProcess;
             }
+        }
+
+        private static bool CheckIfProcess64Bit(Process process)
+        {
+            try
+            {
+                string? filePath = process.MainModule?.FileName;
+                if (filePath is not null)
+                {
+                    // This was unauthorized in all of my testing, even with sudo, but ChatGPT and Bard assure me this is correct
+                    using (var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read))
+                    {
+                        byte[] buffer = new byte[5];
+                        if (stream.Read(buffer, 0, buffer.Length) == buffer.Length)
+                        {
+                            // The 5th byte of the ELF header indicate the architecture
+                            // 0x01: 32-bit, 0x02: 64-bit
+                            return buffer[4] == 0x02;
+                        }
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                throw new Exception(string.Format("Unable to read ELF header from target process {0}: {1}", process.Id, e.Message));
+            }
+
+            // Default to 64bit because it's 2023 and 64bit should be the majority at this point
+            return true;
         }
 
         #region Read
