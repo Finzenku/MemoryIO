@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Text;
-using MemoryManagement.Managers;
+using MemoryManagement.Managers.Factories;
 
 namespace MemoryManagement.Managers
 {
@@ -8,21 +8,9 @@ namespace MemoryManagement.Managers
     {
         private IPlatformMemoryManager m;
 
-        public Process Process => m.Process;
-
-        public bool Is64BitProcess => m.Is64BitProcess;
-
         public MemoryManager(Process process)
         {
-            if (Environment.OSVersion.Platform == PlatformID.Unix ||
-                Environment.OSVersion.Platform == PlatformID.MacOSX)
-            {
-                m = new LinuxMemoryManager(process);
-            }
-            else
-            {
-                m = new WindowsMemoryManager(process);
-            }
+            m = MemoryManagerFactory.CreatePlatformMemoryManager(process);
         }
 
         public T Read<T>(IntPtr address) => m.Read<T>(address);
