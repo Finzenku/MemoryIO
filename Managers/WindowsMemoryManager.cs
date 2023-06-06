@@ -102,6 +102,8 @@ namespace MemoryManagement.Managers
             return split;
         }
 
+        public void WriteData(IntPtr address, byte[] data) => WriteProcessMemory(Process.Handle, address, data, data.Length, out _);
+
         public void Write<T>(IntPtr address, T value)
         {
             byte[] data = MarshalType<T>.ObjectToByteArray(value);
@@ -110,12 +112,12 @@ namespace MemoryManagement.Managers
 
         public void WriteArray<T>(IntPtr address, T[] value)
         {
-            int typeSize = MarshalType<T>.Size;
             if (value is byte[] byteArray)
             {
-                WriteProcessMemory(Process.Handle, address, byteArray, byteArray.Length, out _);
+                WriteData(address, byteArray);
                 return;
             }
+            int typeSize = MarshalType<T>.Size;
             byte[] data = new byte[value.Length*typeSize];
             for (int i = 0; i < value.Length; i++)
             {

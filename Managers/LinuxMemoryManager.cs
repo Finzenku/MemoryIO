@@ -177,6 +177,23 @@ namespace MemoryManagement.Managers
 
             return process_vm_writev(Process.Id, &localIo, 1, &remoteIo, 1, 0) != -1;
         }
+
+        public void WriteData(IntPtr address, byte[] data)
+        {
+            if (data.Length == 0)
+                return;
+
+            int dataLength = 4 * data.Length;
+
+            unsafe
+            {
+                fixed (byte* valuePtr = data)
+                {
+                    Write(address, valuePtr, dataLength);
+                }
+            }
+        }
+
         public void Write<T>(IntPtr address, T value)
         {
             if (value is null)
@@ -201,20 +218,13 @@ namespace MemoryManagement.Managers
             if (value is null || value.Length == 0)
                 return;
 
-            int dataLength = Marshal.SizeOf<T>() * value.Length;
-
             if (value is byte[] byteArray)
             {
-                unsafe
-                {
-                    fixed (byte* valuePtr = byteArray)
-                    {
-                        Write(address, valuePtr, dataLength);
-                    }
-                }
+                WriteData(address, byteArray);
                 return;
             }
 
+            int dataLength = Marshal.SizeOf<T>() * value.Length;
             IntPtr dataPointer = Marshal.AllocHGlobal(dataLength);
             try
             {

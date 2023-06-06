@@ -21,6 +21,8 @@ namespace MemoryManagement.Managers
         public string ReadString(IntPtr address, Encoding encoding, int maxLength = 512) => m.ReadString(address, encoding, maxLength);
         public string[] ReadStringArray(IntPtr address, Encoding encoding, int maxLength = 512) => m.ReadStringArray(address, encoding, maxLength);
 
+        public void WriteData(IntPtr address, byte[] data) => m.WriteData(address, data);
+
         public void Write<T>(IntPtr address, T value) => m.Write<T>(address, value);
         public void WriteArray<T>(IntPtr address, T[] value) => m.WriteArray(address, value);
 
