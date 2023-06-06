@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Text;
-using MemoryManagement.Managers.Factories;
+using MemoryManagement.Factories;
 
 namespace MemoryManagement.Managers
 {

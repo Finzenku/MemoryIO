@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
+using MemoryManagement.Managers;
 
-namespace MemoryManagement.Managers.Factories
+namespace MemoryManagement.Factories
 {
     public static class MemoryManagerFactory
     {
