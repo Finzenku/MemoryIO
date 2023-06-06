@@ -48,14 +48,6 @@ namespace MemoryManagement.Managers
             }
         }
 
-        public T Read<T>(IntPtr address)
-        {
-            int dataSize = MarshalType<T>.Size;
-            byte[] buffer = new byte[dataSize];
-
-            ReadProcessMemory(Process.Handle, address, buffer, dataSize, out _);
-            return MarshalType<T>.ByteArrayToObject(buffer);
-        }
 
         public byte[] ReadData(IntPtr address, int dataLength)
         {
@@ -63,6 +55,14 @@ namespace MemoryManagement.Managers
 
             ReadProcessMemory(Process.Handle, address, buffer, dataLength, out _);
             return buffer[..dataLength];
+        }
+        public T Read<T>(IntPtr address)
+        {
+            int dataSize = MarshalType<T>.Size;
+            byte[] buffer = new byte[dataSize];
+
+            ReadProcessMemory(Process.Handle, address, buffer, dataSize, out _);
+            return MarshalType<T>.ByteArrayToObject(buffer);
         }
 
         public T[] ReadArray<T>(IntPtr address, int arrayLength)
