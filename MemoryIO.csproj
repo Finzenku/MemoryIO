@@ -5,11 +5,42 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <ApplicationIcon>MemoryIO.ico</ApplicationIcon>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <Title>MemoryIO</Title>
+	<VersionPrefix>1.0.1</VersionPrefix>
+    <Description>A C# library designed around conveniently reading and writing data in memory on Windows and Linux. Provides interfaces and implementations to interact with process memory and perform data manipulation.</Description>
+    <PackageIcon>MemoryIO.png</PackageIcon>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <RepositoryUrl>https://github.com/Finzenku/MemoryIO</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>Memory; Memory IO; Data Access; Cross-Platform</PackageTags>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageReleaseNotes>Fixed an issue from 1.0.0 where MemoryMonitors required an IProcessMemoryIO instead of just an IMemoryIO</PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Include="MemoryIO.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\MemoryIO.png">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="MemoryIO.ico">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
     <None Update="MemorySharp\LICENSE">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </None>
+    <None Update="README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
     </None>
   </ItemGroup>
 
