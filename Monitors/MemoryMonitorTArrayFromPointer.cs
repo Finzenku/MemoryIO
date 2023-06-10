@@ -14,7 +14,7 @@ namespace MemoryIO.Monitors
         public event EventHandler<MemoryArrayChangedEventArgs<T>>? MemoryChanged;
 
         private IntPtr pointerAddress;
-        private IProcessMemoryIO memoryManager;
+        private IMemoryIO memoryManager;
         private int pointerOffset;
         private int dataSize;
         private int arrayLength;
@@ -25,13 +25,13 @@ namespace MemoryIO.Monitors
         /// <summary>
         /// Initializes a new instance of the <see cref="MemoryMonitorTArrayFromPointer{T}"/> class.
         /// </summary>
-        /// <param name="memoryManager">The <see cref="IProcessMemoryIO"/> used to read memory.</param>
+        /// <param name="memoryManager">The <see cref="IMemoryIO"/> used to read memory.</param>
         /// <param name="pointerAddress">The addres of the pointer that is pointing to the start of the memory array.</param>
         /// <param name="arrayLength">The number of <see cref="T"/> objects in the memory array.</param>
         /// <param name="pointerOffset">The offset from the pointer value to the start of the array.</param>
         /// <param name="pollingRateInMilliseconds">The interval between memory checks in milliseconds.</param>
         /// <exception cref="ArgumentException">Thrown when <paramref name="memoryManager"/> is null or <paramref name="arrayLength"/> is not greater than 0.</exception>
-        public MemoryMonitorTArrayFromPointer(IProcessMemoryIO memoryManager, IntPtr pointerAddress, int arrayLength, int pointerOffset = 0, int pollingRateInMilliseconds = 10)
+        public MemoryMonitorTArrayFromPointer(IMemoryIO memoryManager, IntPtr pointerAddress, int arrayLength, int pointerOffset = 0, int pollingRateInMilliseconds = 10)
         {
             if (memoryManager is null)
                 throw new ArgumentException("MemoryManager must not be null.", nameof(memoryManager));

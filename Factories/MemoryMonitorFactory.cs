@@ -4,10 +4,10 @@ namespace MemoryIO.Factories
 {
     public class MemoryMonitorFactory
     {
-        private readonly IProcessMemoryIO memoryManager;
+        private readonly IMemoryIO memoryManager;
         private readonly int pollingRate;
 
-        public MemoryMonitorFactory(IProcessMemoryIO memoryManager, int pollingRateInMilliseconds = 10)
+        public MemoryMonitorFactory(IMemoryIO memoryManager, int pollingRateInMilliseconds = 10)
         {
             this.memoryManager = memoryManager;
             pollingRate = pollingRateInMilliseconds;
