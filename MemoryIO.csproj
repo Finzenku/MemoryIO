@@ -5,7 +5,6 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <ApplicationIcon>MemoryIO.ico</ApplicationIcon>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <Title>MemoryIO</Title>
 	<VersionPrefix>1.0.1</VersionPrefix>
@@ -20,10 +19,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Include="MemoryIO.ico" />
-  </ItemGroup>
-
-  <ItemGroup>
     <None Include="..\MemoryIO.png">
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
@@ -31,10 +26,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="MemoryIO.ico">
-      <Pack>True</Pack>
-      <PackagePath>\</PackagePath>
-    </None>
     <None Update="MemorySharp\LICENSE">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </None>
