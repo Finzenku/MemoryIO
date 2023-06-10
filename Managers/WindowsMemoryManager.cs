@@ -5,7 +5,7 @@ using System.Text;
 
 namespace MemoryManagement.Managers
 {
-    internal class WindowsMemoryManager : IPlatformMemoryManager
+    public class WindowsMemoryManager : IPlatformMemoryManager
     {
         public Process Process { get; }
 

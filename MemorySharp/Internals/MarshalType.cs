@@ -17,7 +17,7 @@ namespace MemoryManagement.Internals
     /// Static class providing tools for extracting information related to types.
     /// </summary>
     /// <typeparam name="T">Type to analyze.</typeparam>
-    internal static class MarshalType<T>
+    public static class MarshalType<T>
     {
         #region Properties
         /// <summary>

@@ -4,7 +4,7 @@ using System.Text;
 
 namespace MemoryManagement.Managers
 {
-    internal class LinuxMemoryManager : IPlatformMemoryManager
+    public class LinuxMemoryManager : IPlatformMemoryManager
     {
         public Process Process { get; }
 
