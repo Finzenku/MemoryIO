@@ -1,11 +1,11 @@
-﻿using MemoryManagement.Internals;
+﻿using MemoryIO.Internals;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Text;
 
-namespace MemoryManagement.Managers
+namespace MemoryIO.Managers
 {
-    public class WindowsMemoryManager : IPlatformMemoryManager
+    public class WindowsMemoryIO : IProcessMemoryIO
     {
         public Process Process { get; }
 
@@ -35,7 +35,7 @@ namespace MemoryManagement.Managers
         [DllImport("kernel32.dll", SetLastError = true)]
         private static extern bool IsWow64Process(IntPtr processHandle, out bool isWow64Process);
 
-        public WindowsMemoryManager(Process process)
+        public WindowsMemoryIO(Process process)
         {
             Process = process;
             if (Environment.Is64BitOperatingSystem && IsWow64Process(process.Handle, out bool isWow64))

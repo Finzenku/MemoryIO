@@ -1,14 +1,14 @@
-﻿using MemoryManagement.Managers;
-using MemoryManagement.Monitors;
+﻿using MemoryIO.Managers;
+using MemoryIO.Monitors;
 
-namespace MemoryManagement.Factories
+namespace MemoryIO.Factories
 {
     public class MemoryMonitorFactory
     {
-        private readonly IMemoryManager memoryManager;
+        private readonly IProcessMemoryIO memoryManager;
         private readonly int pollingRate;
 
-        public MemoryMonitorFactory(IMemoryManager memoryManager, int pollingRateInMilliseconds = 10)
+        public MemoryMonitorFactory(IProcessMemoryIO memoryManager, int pollingRateInMilliseconds = 10)
         {
             this.memoryManager = memoryManager;
             pollingRate = pollingRateInMilliseconds;

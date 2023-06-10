@@ -1,4 +1,4 @@
-﻿namespace MemoryManagement.Monitors
+﻿namespace MemoryIO.Monitors
 {
     public class MemoryArrayChangedEventArgs<T> : EventArgs
     {

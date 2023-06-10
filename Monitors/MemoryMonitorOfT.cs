@@ -1,7 +1,7 @@
-﻿using MemoryManagement.Internals;
-using MemoryManagement.Managers;
+﻿using MemoryIO.Internals;
+using MemoryIO.Managers;
 
-namespace MemoryManagement.Monitors
+namespace MemoryIO.Monitors
 {
     /// <summary>
     /// Monitors a specific region of memory and captures the changes as the specified type T.
@@ -15,7 +15,7 @@ namespace MemoryManagement.Monitors
         public event EventHandler<MemoryChangedEventArgs<T>>? MemoryChanged;
 
         private IntPtr address;
-        private IMemoryManager memoryManager;
+        private IProcessMemoryIO memoryManager;
         private int dataSize;
         private byte[] previousData;
         private int pollingRate;
@@ -24,11 +24,11 @@ namespace MemoryManagement.Monitors
         /// <summary>
         /// Initializes a new instance of the <see cref="MemoryMonitor{T}"/> class.
         /// </summary>
-        /// <param name="memoryManager">The <see cref="IMemoryManager"/> used to read memory.</param>
+        /// <param name="memoryManager">The <see cref="IProcessMemoryIO"/> used to read memory.</param>
         /// <param name="address">The starting address of the monitored memory region.</param>
         /// <param name="pollingRateInMilliseconds">The interval between memory checks in milliseconds.</param>
         /// <exception cref="ArgumentException">Thrown when <paramref name="memoryManager"/> is null.</exception>
-        public MemoryMonitor(IMemoryManager memoryManager, IntPtr address, int pollingRateInMilliseconds = 10)
+        public MemoryMonitor(IProcessMemoryIO memoryManager, IntPtr address, int pollingRateInMilliseconds = 10)
         {
             if (memoryManager is null)
                 throw new ArgumentException("MemoryManager must not be null.", nameof(memoryManager));

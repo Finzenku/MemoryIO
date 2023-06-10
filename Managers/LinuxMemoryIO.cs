@@ -2,9 +2,9 @@ using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Text;
 
-namespace MemoryManagement.Managers
+namespace MemoryIO.Managers
 {
-    public class LinuxMemoryManager : IPlatformMemoryManager
+    public class LinuxMemoryIO : IProcessMemoryIO
     {
         public Process Process { get; }
 
@@ -20,7 +20,7 @@ namespace MemoryManagement.Managers
         [DllImport("libc")]
         public static extern uint getuid ();
         
-        public LinuxMemoryManager(Process process)
+        public LinuxMemoryIO(Process process)
         {
             Process = process;
             try

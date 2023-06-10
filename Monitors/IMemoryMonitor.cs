@@ -1,4 +1,4 @@
-﻿namespace MemoryManagement.Monitors
+﻿namespace MemoryIO.Monitors
 {
     public interface IMemoryMonitor<TEventArgs> where TEventArgs: EventArgs
     {

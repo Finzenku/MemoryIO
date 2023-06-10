@@ -1,6 +1,6 @@
-﻿using MemoryManagement.Managers;
+﻿using MemoryIO.Managers;
 
-namespace MemoryManagement.Monitors
+namespace MemoryIO.Monitors
 {
     /// <summary>
     /// Monitors a specific region of memory pointed to by a pointer and captures the changes as a byte array.
@@ -13,7 +13,7 @@ namespace MemoryManagement.Monitors
         public event EventHandler<MemoryChangedEventArgs<byte[]>>? MemoryChanged;
 
         private IntPtr pointerAddress;
-        private IMemoryManager memoryManager;
+        private IProcessMemoryIO memoryManager;
         private int pointerOffset;
         private int regionSize;
         private byte[] previousData;
@@ -23,13 +23,13 @@ namespace MemoryManagement.Monitors
         /// <summary>
         /// Initializes a new instance of the <see cref="MemoryMonitorFromPointer"/> class.
         /// </summary>
-        /// <param name="memoryManager">The <see cref="IMemoryManager"/> used to read memory.</param>
+        /// <param name="memoryManager">The <see cref="IProcessMemoryIO"/> used to read memory.</param>
         /// <param name="pointerAddress">The address of the pointer pointing to the start of the memory region.</param>
         /// <param name="regionSize">The size of the memory region to monitor.</param>
         /// <param name="pointerOffset">The offset from the pointer value to the start of the memory region.</param>
         /// <param name="pollingRateInMilliseconds">The interval between memory checks in milliseconds.</param>
         /// <exception cref="ArgumentException">Thrown when <paramref name="memoryManager"/> is null.</exception>
-        public MemoryMonitorFromPointer(IMemoryManager memoryManager, IntPtr pointerAddress, int regionSize, int pointerOffset = 0, int pollingRateInMilliseconds = 10)
+        public MemoryMonitorFromPointer(IProcessMemoryIO memoryManager, IntPtr pointerAddress, int regionSize, int pointerOffset = 0, int pollingRateInMilliseconds = 10)
         {
             if (memoryManager is null)
                 throw new ArgumentException("MemoryManager must not be null.", nameof(memoryManager));

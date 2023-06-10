@@ -1,8 +1,8 @@
 using System.Text;
 
-namespace MemoryManagement.Managers
+namespace MemoryIO.Managers
 {
-    public interface IMemoryManager
+    public interface IMemoryIO
     {
         public byte[] ReadData(IntPtr address, int dataLength);
         public T Read<T>(IntPtr address);

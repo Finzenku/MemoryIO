@@ -1,8 +1,8 @@
 ﻿using System.Diagnostics;
 
-namespace MemoryManagement.Managers
+namespace MemoryIO.Managers
 {
-    public interface IPlatformMemoryManager : IMemoryManager
+    public interface IProcessMemoryIO : IMemoryIO
     {
         public Process Process { get; }
         public PlatformID Platform { get; }

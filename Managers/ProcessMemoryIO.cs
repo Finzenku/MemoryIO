@@ -1,16 +1,22 @@
 ﻿using System.Diagnostics;
 using System.Text;
-using MemoryManagement.Factories;
+using MemoryIO.Factories;
 
-namespace MemoryManagement.Managers
+namespace MemoryIO.Managers
 {
-    public class MemoryManager : IMemoryManager
+    public class ProcessMemoryIO : IProcessMemoryIO
     {
-        private IPlatformMemoryManager m;
+        private IProcessMemoryIO m;
 
-        public MemoryManager(Process process)
+        public Process Process => m.Process;
+
+        public PlatformID Platform => m.Platform;
+
+        public bool Is64BitProcess => m.Is64BitProcess;
+
+        public ProcessMemoryIO(Process process)
         {
-            m = MemoryManagerFactory.CreatePlatformMemoryManager(process);
+            m = MemoryIOFactory.CreateEnvironmentSpecificMemoryIO(process);
         }
 
         public byte[] ReadData(IntPtr address, int dataLength) => m.ReadData(address, dataLength);

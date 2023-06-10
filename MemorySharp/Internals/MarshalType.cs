@@ -9,9 +9,9 @@
 using System;
 using System.Runtime.InteropServices;
 using System.Text;
-using MemoryManagement.Memory;
+using MemoryIO.Memory;
 
-namespace MemoryManagement.Internals
+namespace MemoryIO.Internals
 {
     /// <summary>
     /// Static class providing tools for extracting information related to types.

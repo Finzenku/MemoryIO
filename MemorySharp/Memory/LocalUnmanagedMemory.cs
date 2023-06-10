@@ -9,7 +9,7 @@
 using System;
 using System.Runtime.InteropServices;
 
-namespace MemoryManagement.Memory
+namespace MemoryIO.Memory
 {
     /// <summary>
     /// Class representing a block of memory allocated in the local process.
