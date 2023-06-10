@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
 
-namespace MemoryIO.Managers
+namespace MemoryIO
 {
     public interface IProcessMemoryIO : IMemoryIO
     {

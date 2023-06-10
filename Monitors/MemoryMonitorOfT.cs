@@ -1,5 +1,4 @@
 ﻿using MemoryIO.Internals;
-using MemoryIO.Managers;
 
 namespace MemoryIO.Monitors
 {

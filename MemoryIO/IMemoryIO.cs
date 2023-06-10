@@ -1,6 +1,6 @@
 using System.Text;
 
-namespace MemoryIO.Managers
+namespace MemoryIO
 {
     public interface IMemoryIO
     {

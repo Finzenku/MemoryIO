@@ -1,5 +1,4 @@
-﻿using MemoryIO.Managers;
-using MemoryIO.Monitors;
+﻿using MemoryIO.Monitors;
 
 namespace MemoryIO.Factories
 {

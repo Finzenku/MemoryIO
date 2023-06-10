@@ -1,5 +1,4 @@
 ﻿using System.Diagnostics;
-using MemoryIO.Managers;
 
 namespace MemoryIO.Factories
 {

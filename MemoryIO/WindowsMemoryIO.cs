@@ -3,7 +3,7 @@ using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Text;
 
-namespace MemoryIO.Managers
+namespace MemoryIO
 {
     public class WindowsMemoryIO : IProcessMemoryIO
     {

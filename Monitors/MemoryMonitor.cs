@@ -1,6 +1,4 @@
-﻿using MemoryIO.Managers;
-
-namespace MemoryIO.Monitors
+﻿namespace MemoryIO.Monitors
 {
     /// <summary>
     /// Monitors a specific region of memory and captures the changes as a byte array.

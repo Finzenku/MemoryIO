@@ -2,7 +2,7 @@
 using System.Text;
 using MemoryIO.Factories;
 
-namespace MemoryIO.Managers
+namespace MemoryIO
 {
     public class ProcessMemoryIO : IProcessMemoryIO
     {
