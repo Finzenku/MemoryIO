@@ -7,7 +7,7 @@ namespace MemoryIO.Monitors
     /// Monitors a specific region of memory and captures the changes as the specified type T.
     /// </summary>
     /// <typeparam name="T">The type of data to monitor.</typeparam>
-    public class MemoryMonitor<T> : IMemoryMonitor<MemoryChangedEventArgs<T>>, IDisposable
+    public class MemoryMonitor<T> : IMemoryMonitor<MemoryChangedEventArgs<T>>, IDisposable where T : unmanaged
     {
         /// <summary>
         /// Event that is raised when the monitored memory region changes.

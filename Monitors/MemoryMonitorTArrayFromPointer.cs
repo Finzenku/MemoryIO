@@ -7,7 +7,7 @@ namespace MemoryIO.Monitors
     /// Monitors a specific array of T elements in memory, pointed to by a pointer, and captures the changes as the specified type T.
     /// </summary>
     /// <typeparam name="T">The type of elements in the array.</typeparam>
-    public class MemoryMonitorTArrayFromPointer<T> : IMemoryMonitor<MemoryArrayChangedEventArgs<T>>, IDisposable
+    public class MemoryMonitorTArrayFromPointer<T> : IMemoryMonitor<MemoryArrayChangedEventArgs<T>>, IDisposable where T : unmanaged
     {
         /// <summary>
         /// Event that is raised when the monitored memory array changes.

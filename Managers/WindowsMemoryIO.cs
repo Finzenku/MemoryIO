@@ -56,7 +56,7 @@ namespace MemoryIO.Managers
             ReadProcessMemory(Process.Handle, address, buffer, dataLength, out _);
             return buffer[..dataLength];
         }
-        public T Read<T>(IntPtr address)
+        public T Read<T>(IntPtr address) where T : unmanaged
         {
             int dataSize = MarshalType<T>.Size;
             byte[] buffer = new byte[dataSize];
@@ -65,7 +65,7 @@ namespace MemoryIO.Managers
             return MarshalType<T>.ByteArrayToObject(buffer);
         }
 
-        public T[] ReadArray<T>(IntPtr address, int arrayLength)
+        public T[] ReadArray<T>(IntPtr address, int arrayLength) where T : unmanaged
         {
             int dataSize = MarshalType<T>.Size;
             byte[] buffer = new byte[dataSize * arrayLength];
@@ -104,13 +104,13 @@ namespace MemoryIO.Managers
 
         public void WriteData(IntPtr address, byte[] data) => WriteProcessMemory(Process.Handle, address, data, data.Length, out _);
 
-        public void Write<T>(IntPtr address, T value)
+        public void Write<T>(IntPtr address, T value) where T : unmanaged
         {
             byte[] data = MarshalType<T>.ObjectToByteArray(value);
             WriteProcessMemory(Process.Handle, address, data, data.Length, out _);
         }
 
-        public void WriteArray<T>(IntPtr address, T[] value)
+        public void WriteArray<T>(IntPtr address, T[] value) where T : unmanaged
         {
             if (value is byte[] byteArray)
             {

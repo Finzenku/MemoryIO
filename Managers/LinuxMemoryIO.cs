@@ -93,7 +93,7 @@ namespace MemoryIO.Managers
             return dataBuffer;
         }
 
-        public T Read<T>(IntPtr address)
+        public T Read<T>(IntPtr address) where T : unmanaged
         {
             T result = default!;
             int tSize = Marshal.SizeOf<T>();
@@ -107,7 +107,7 @@ namespace MemoryIO.Managers
             }
             return result;
         }
-        public T[] ReadArray<T>(IntPtr address, int arrayLength)
+        public T[] ReadArray<T>(IntPtr address, int arrayLength) where T : unmanaged
         {
             int tSize = Marshal.SizeOf<T>();
             int dataLength = tSize * arrayLength;
@@ -194,10 +194,8 @@ namespace MemoryIO.Managers
             }
         }
 
-        public void Write<T>(IntPtr address, T value)
+        public void Write<T>(IntPtr address, T value) where T : unmanaged
         {
-            if (value is null)
-                return;
             int tSize = Marshal.SizeOf<T>();
             IntPtr dataPointer = Marshal.AllocHGlobal(tSize);
             try
@@ -213,7 +211,7 @@ namespace MemoryIO.Managers
                 Marshal.FreeHGlobal(dataPointer);
             }
         }
-        public void WriteArray<T>(IntPtr address, T[] value)
+        public void WriteArray<T>(IntPtr address, T[] value) where T : unmanaged
         {
             if (value is null || value.Length == 0)
                 return;

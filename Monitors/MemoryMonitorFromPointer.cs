@@ -5,12 +5,12 @@ namespace MemoryIO.Monitors
     /// <summary>
     /// Monitors a specific region of memory pointed to by a pointer and captures the changes as a byte array.
     /// </summary>
-    public class MemoryMonitorFromPointer : IMemoryMonitor<MemoryChangedEventArgs<byte[]>>, IDisposable
+    public class MemoryMonitorFromPointer : IMemoryMonitor<MemoryRegionChangedEventArgs>, IDisposable
     {
         /// <summary>
         /// Event that is raised when the monitored memory region changes.
         /// </summary>
-        public event EventHandler<MemoryChangedEventArgs<byte[]>>? MemoryChanged;
+        public event EventHandler<MemoryRegionChangedEventArgs>? MemoryChanged;
 
         private IntPtr pointerAddress;
         private IProcessMemoryIO memoryManager;
@@ -45,7 +45,7 @@ namespace MemoryIO.Monitors
 
         void OnMemoryChanged(IntPtr address, byte[] value)
         {
-            MemoryChangedEventArgs<byte[]> args = new MemoryChangedEventArgs<byte[]>(address, value);
+            MemoryRegionChangedEventArgs args = new MemoryRegionChangedEventArgs(address, value);
             MemoryChanged?.Invoke(this, args);
         }
 

@@ -1,6 +1,6 @@
 ﻿namespace MemoryIO.Monitors
 {
-    public class MemoryArrayChangedEventArgs<T> : EventArgs
+    public class MemoryArrayChangedEventArgs<T> : EventArgs where T : unmanaged
     {
         public IntPtr Address { get; }
         public T Value { get; }
