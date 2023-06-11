@@ -1,10 +1,9 @@
 using System.Diagnostics;
 using System.Runtime.InteropServices;
-using System.Text;
 
 namespace MemoryIO
 {
-    public class LinuxMemoryIO : IProcessMemoryIO
+    public class LinuxMemoryIO : BaseMemoryIO, IProcessMemoryIO
     {
         public Process Process { get; }
 
@@ -80,7 +79,7 @@ namespace MemoryIO
             return process_vm_readv(Process.Id, &localIo, 1, &remoteIo, 1, 0) != -1;
         }
 
-        public byte[] ReadData(IntPtr address, int dataLength)
+        public override byte[] ReadData(IntPtr address, int dataLength)
         {
             byte[] dataBuffer = new byte[dataLength];
             unsafe
@@ -91,72 +90,6 @@ namespace MemoryIO
                 }
             }
             return dataBuffer;
-        }
-
-        public T Read<T>(IntPtr address) where T : unmanaged
-        {
-            T result = default!;
-            int tSize = Marshal.SizeOf<T>();
-            unsafe
-            {
-                IntPtr pDataPointer = Marshal.AllocHGlobal(tSize);
-                if (Read(address, pDataPointer.ToPointer(), tSize))
-                {
-                    result = Marshal.PtrToStructure<T>(pDataPointer)!;
-                }
-            }
-            return result;
-        }
-        public T[] ReadArray<T>(IntPtr address, int arrayLength) where T : unmanaged
-        {
-            int tSize = Marshal.SizeOf<T>();
-            int dataLength = tSize * arrayLength;
-            T[] array = new T[arrayLength];
-
-            IntPtr pDataPointer = Marshal.AllocHGlobal(dataLength);
-            try
-            {
-                unsafe
-                {
-                    if (Read(address, pDataPointer.ToPointer(), dataLength))
-                    {
-                        for (int i = 0; i < arrayLength; i++)
-                        {
-                            IntPtr tAddress = IntPtr.Add(pDataPointer, i * tSize);
-                            array[i] = Marshal.PtrToStructure<T>(tAddress)!;
-                        }
-                    }
-                }
-            }
-            finally
-            {
-                Marshal.FreeHGlobal(pDataPointer);
-            }
-
-            return array;
-        }
-
-        public string ReadString(IntPtr address, Encoding encoding, int maxLength = 512)
-        {
-            byte[] byteValue = ReadData(address, maxLength);
-            string encoded = encoding.GetString(byteValue);
-
-            // Search the end of the string
-            var endOfStringPosition = encoded.IndexOf('\0');
-
-            // Crop the string with this end if found, return the string otherwise
-            return endOfStringPosition == -1 ? encoded : encoded.Substring(0, endOfStringPosition);            
-        }
-        public string[] ReadStringArray(IntPtr address, Encoding encoding, int maxLength = 512)
-        {
-            byte[] byteValue = ReadData(address, maxLength);
-            string encoded = encoding.GetString(byteValue);
-
-            string[] split = encoded.Split('\0');
-            for (int i = 0; i < split.Length; i++)
-                if (split[i] == string.Empty)
-                    return split[0..i];
-            return split;
         }
         #endregion
 
@@ -178,103 +111,16 @@ namespace MemoryIO
             return process_vm_writev(Process.Id, &localIo, 1, &remoteIo, 1, 0) != -1;
         }
 
-        public void WriteData(IntPtr address, byte[] data)
+        public override void WriteData(IntPtr address, byte[] data)
         {
             if (data.Length == 0)
                 return;
-
-            int dataLength = 4 * data.Length;
 
             unsafe
             {
                 fixed (byte* valuePtr = data)
                 {
-                    Write(address, valuePtr, dataLength);
-                }
-            }
-        }
-
-        public void Write<T>(IntPtr address, T value) where T : unmanaged
-        {
-            int tSize = Marshal.SizeOf<T>();
-            IntPtr dataPointer = Marshal.AllocHGlobal(tSize);
-            try
-            {
-                Marshal.StructureToPtr(value, dataPointer, false);
-                unsafe
-                {
-                    Write(address, dataPointer.ToPointer(), tSize);
-                }
-            }
-            finally
-            {
-                Marshal.FreeHGlobal(dataPointer);
-            }
-        }
-        public void WriteArray<T>(IntPtr address, T[] value) where T : unmanaged
-        {
-            if (value is null || value.Length == 0)
-                return;
-
-            if (value is byte[] byteArray)
-            {
-                WriteData(address, byteArray);
-                return;
-            }
-
-            int dataLength = Marshal.SizeOf<T>() * value.Length;
-            IntPtr dataPointer = Marshal.AllocHGlobal(dataLength);
-            try
-            {
-                byte[] buffer = new byte[dataLength];
-                Buffer.BlockCopy(value, 0, buffer, 0, dataLength);
-
-                unsafe
-                {
-                    fixed (byte* bufferPtr = buffer)
-                    {
-                        Write(address, bufferPtr, dataLength);
-                    }
-                }
-            }
-            finally
-            {
-                Marshal.FreeHGlobal(dataPointer);
-            }
-        }
-
-        public void WriteString(IntPtr address, string text, Encoding encoding)
-        {
-            byte[] buffer = encoding.GetBytes(text+'\0');
-            unsafe
-            {
-                fixed (byte* bufferPtr = buffer)
-                {
-                    Write(address, bufferPtr, buffer.Length);
-                }
-            }
-        }
-        public void WriteStringArray(IntPtr address, string[] text, Encoding encoding)
-        {
-            int totalLength = 0;
-            foreach (string s in text)
-                totalLength += encoding.GetByteCount(s) + 1; // +1 for null termination
-
-            byte[] buffer = new byte[totalLength];
-            int offset = 0;
-
-            foreach (string s in text)
-            {
-                int byteCount = encoding.GetBytes(s, buffer.AsSpan(offset));
-                buffer[offset + byteCount] = 0; // Null termination
-                offset += byteCount + 1; // Move the offset to the next string
-            }
-
-            unsafe
-            {
-                fixed (byte* bufferPtr = buffer)
-                {
-                    Write(address, bufferPtr, buffer.Length);
+                    Write(address, valuePtr, data.Length);
                 }
             }
         }
