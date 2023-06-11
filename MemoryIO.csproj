@@ -7,7 +7,7 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <Title>MemoryIO</Title>
-	<VersionPrefix>1.0.2</VersionPrefix>
+	<VersionPrefix>1.1.0</VersionPrefix>
     <Description>A C# library designed around conveniently reading and writing data in memory on Windows and Linux. Provides interfaces and implementations to interact with process memory and perform data manipulation.</Description>
     <PackageIcon>MemoryIO.png</PackageIcon>
     <PackageReadmeFile>README.md</PackageReadmeFile>
@@ -15,7 +15,7 @@
     <RepositoryType>git</RepositoryType>
     <PackageTags>Memory; Memory IO; Data Access; Cross-Platform</PackageTags>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageReleaseNotes>Removed Application Icon that was being included with the package</PackageReleaseNotes>
+    <PackageReleaseNotes>Removed dependency on MemorySharp's MarshalType and removed it from the project. Added BaseMemoryIO for simplier implementations of IMemoryIO.</PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>

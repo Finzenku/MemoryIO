@@ -7,7 +7,9 @@ Provides interfaces and implementations to interact with process memory and perf
 
 The core interface `IMemoryIO` defines methods for reading and writing data of generic unmanaged objects, strings, and byte arrays. 
 `WindowsMemoryIO` and `LinuxMemoryIO` provide platform-specific access to a `Process` memory using `kernel32` and `libc` respectively.
-The `ProcessMemoryIO` implementation is a wrapper class to allow for platform-independant `Process` memory manipulation based on `Environment.OSVersion.Platform`.
+The `ProcessMemoryIO` implementation is a wrapper class to allow for platform-independant `Process` memory manipulation based on `Environment.OSVersion.Platform`.  
+
+`BaseMemoryIO` provides a simple way to implement an `IMemoryIO` object by only needing to provide implemention for `ReadData` and `WriteData`.
 
 ### MemoryMonitors
 
