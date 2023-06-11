@@ -13,7 +13,7 @@
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <RepositoryUrl>https://github.com/Finzenku/MemoryIO</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
-    <PackageTags>Memory; Memory IO; Data Access; Cross-Platform</PackageTags>
+    <PackageTags>Memory; IO; Data-Access; Cross-Platform</PackageTags>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageReleaseNotes>Removed dependency on MemorySharp's MarshalType and removed it from the project. Added BaseMemoryIO for simplier implementations of IMemoryIO.</PackageReleaseNotes>
   </PropertyGroup>
