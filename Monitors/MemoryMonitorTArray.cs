@@ -1,4 +1,4 @@
-﻿using MemoryIO.Internals;
+﻿using System.Runtime.InteropServices;
 
 namespace MemoryIO.Monitors
 {
@@ -39,7 +39,7 @@ namespace MemoryIO.Monitors
 
             this.address = address;
             this.memoryManager = memoryManager;
-            dataSize = MarshalType<T>.Size;
+            dataSize = Marshal.SizeOf<T>();
             this.arrayLength = arrayLength;
             previousData = new byte[arrayLength * dataSize];
             pollingRate = pollingRateInMilliseconds;
@@ -69,7 +69,7 @@ namespace MemoryIO.Monitors
                     byte[] currentData = memoryManager.ReadData(address + startIndex, dataSize);
                     if (!previousData.AsSpan(startIndex, dataSize).SequenceEqual(currentData))
                     {
-                        OnMemoryChanged(address, MarshalType<T>.ByteArrayToObject(currentData), i);
+                        OnMemoryChanged(address, MemoryMarshal.Cast<byte, T>(currentData)[0], i);
                         currentData.CopyTo(previousData, startIndex);
                     }
                 }
@@ -99,7 +99,7 @@ namespace MemoryIO.Monitors
                         byte[] currentData = memoryManager.ReadData(address + startIndex, dataSize);
                         if (!previousData.AsSpan(startIndex, dataSize).SequenceEqual(currentData))
                         {
-                            OnMemoryChanged(address, MarshalType<T>.ByteArrayToObject(currentData), i);
+                            OnMemoryChanged(address, MemoryMarshal.Cast<byte, T>(currentData)[0], i);
                             currentData.CopyTo(previousData, startIndex);
                         }
                     }

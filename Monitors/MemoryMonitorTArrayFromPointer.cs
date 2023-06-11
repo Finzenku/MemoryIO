@@ -1,4 +1,4 @@
-﻿using MemoryIO.Internals;
+﻿using System.Runtime.InteropServices;
 
 namespace MemoryIO.Monitors
 {
@@ -43,7 +43,7 @@ namespace MemoryIO.Monitors
             this.memoryManager = memoryManager;
             this.pointerOffset = pointerOffset;
             this.arrayLength = arrayLength;
-            dataSize = MarshalType<T>.Size;
+            dataSize = Marshal.SizeOf<T>();
             previousData = new byte[dataSize * arrayLength];
             pollingRate = pollingRateInMilliseconds;
             isMonitoring = false;
@@ -75,7 +75,7 @@ namespace MemoryIO.Monitors
                         byte[] currentData = memoryManager.ReadData(currentPointerValue + pointerOffset + startIndex, dataSize);
                         if (!previousData.AsSpan(startIndex, dataSize).SequenceEqual(currentData))
                         {
-                            OnMemoryChanged(currentPointerValue + pointerOffset, MarshalType<T>.ByteArrayToObject(currentData), i);
+                            OnMemoryChanged(currentPointerValue + pointerOffset, MemoryMarshal.Cast<byte, T>(currentData)[0], i);
                             currentData.CopyTo(previousData, startIndex);
                         }
                     }
@@ -109,7 +109,7 @@ namespace MemoryIO.Monitors
                             byte[] currentData = memoryManager.ReadData(currentPointerValue + pointerOffset + startIndex, dataSize);
                             if (!previousData.AsSpan(startIndex, dataSize).SequenceEqual(currentData))
                             {
-                                OnMemoryChanged(currentPointerValue + pointerOffset, MarshalType<T>.ByteArrayToObject(currentData), i);
+                                OnMemoryChanged(currentPointerValue + pointerOffset, MemoryMarshal.Cast<byte, T>(currentData)[0], i);
                                 currentData.CopyTo(previousData, startIndex);
                             }
                         }
