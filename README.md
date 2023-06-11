@@ -88,4 +88,4 @@ var monitorTask = myStructArrayMonitor.StartMonitoringAsync(cts.Token);
 
 ### Credit
 
-Inspired by and uses basic parts of https://github.com/JamesMenetrey/MemorySharp for Mashralling to and from byte arrays.
+Inspired by https://github.com/JamesMenetrey/MemorySharp.
